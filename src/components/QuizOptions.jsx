@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
-import { useReducerContext } from '../Hooks/StartContext';
+import { useQuiz } from '../contexts/QuizContext';
 import decodeHTML from '../functions/decodeHTML';
+
 function shuffleArray(array) {
   // Create a copy of the array so as not to mutate the original
   const newArray = [...array];
@@ -11,65 +12,66 @@ function shuffleArray(array) {
   return newArray;
 }
 
-function QuizOptions({ hasAnswered }) {
-  const {
-    state: {
-      general = [],
-      index,
-      generalQuestionOrder,
-      generalQuestionUserAnswer,
-    },
-    dispatch,
-  } = useReducerContext();
+function QuizOptions({ hasAnswered, quizData }) {
+  const { state, dispatch } = useQuiz();
+  const { index, type } = state;
 
-  const correctAnswer = general.at(index)?.correct_answer;
-  const options = useMemo(
-    function () {
-      const currentQuestion = general.at(index);
-      if (!currentQuestion) return [];
-      const allOptions = [
-        ...currentQuestion.incorrect_answers,
-        currentQuestion.correct_answer,
-      ];
-      return shuffleArray(allOptions);
-    },
-    [index, general]
-  );
+  // Access nested properties from quizData
+  const storedOptions = quizData.storedOptions;
+  const currentQuestion = quizData.questions.at(index);
+  const correctAnswer = currentQuestion?.correct_answer;
+  const selectedAnswer = quizData.userAnswers[index]?.selected || null;
 
-  const optionStore = generalQuestionOrder.at(index)
-    ? generalQuestionOrder.at(index)
+  // Create options from the current question
+  const options = useMemo(() => {
+    if (!currentQuestion) return [];
+    // Flatten the incorrect answers and add the correct answer.
+    const allOptions = [
+      ...(Array.isArray(currentQuestion.incorrect_answers)
+        ? currentQuestion.incorrect_answers
+        : []),
+      currentQuestion.correct_answer,
+    ];
+    return shuffleArray(allOptions);
+  }, [currentQuestion]);
+
+  // Use stored options if they exist; otherwise use the freshly shuffled options
+  const optionStored = storedOptions?.at(index)
+    ? storedOptions.at(index)
     : options;
-  const selectedAnswer = generalQuestionUserAnswer[index]?.selected || null;
 
-  useEffect(
-    function () {
-      if (generalQuestionOrder.at(index) || options.length === 0) return;
-      dispatch({ type: 'setShuffled', payload: { options, index } });
-    },
-    [index, dispatch, options, generalQuestionOrder]
-  );
+  useEffect(() => {
+    // If the options for this index are not stored and options exist, store them.
+    if (storedOptions?.at(index) || options.length === 0) return;
+    dispatch({
+      type: 'question/option/stored',
+      payload: { type, options, index },
+    });
+  }, [dispatch, index, options, storedOptions, type]);
+
   function handleSelectOption(option) {
-    dispatch({ type: 'answered', payload: { option, correctAnswer, index } });
+    dispatch({
+      type: 'question/answered',
+      payload: { option, correctAnswer, index, type },
+    });
   }
 
-  return optionStore.map((option, i) => {
-    return (
-      <button
-        disabled={hasAnswered}
-        onClick={() => handleSelectOption(option)}
-        key={i}
-        className={` ${
-          hasAnswered && selectedAnswer === option
-            ? option === correctAnswer
-              ? 'bg-green-300'
-              : 'bg-red-300 font-semibold'
-            : ''
-        } shadow-(--box-shadow-2) duration-10 col-span-2 rounded-sm !p-3 text-[1.2rem] transition-colors `}
-      >
-        {decodeHTML(option)}
-      </button>
-    );
-  });
+  return optionStored.map((option, i) => (
+    <button
+      disabled={hasAnswered}
+      onClick={() => handleSelectOption(option)}
+      key={i}
+      className={`${
+        hasAnswered && selectedAnswer === option
+          ? option === correctAnswer
+            ? 'bg-green-300'
+            : 'bg-red-300 font-semibold'
+          : ''
+      } shadow-(--box-shadow-2) duration-10 col-span-2 rounded-sm !p-3 text-[1.2rem] transition-colors`}
+    >
+      {decodeHTML(option)}
+    </button>
+  ));
 }
 
 export default QuizOptions;
