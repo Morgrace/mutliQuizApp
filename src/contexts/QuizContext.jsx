@@ -1,5 +1,4 @@
 import { createContext, useContext, useReducer } from "react";
-
 const getQuestions = (type) => {
   try {
     const stored = localStorage.getItem(type);
@@ -112,7 +111,7 @@ function reducer(state, action) {
         index: state.index < 1 ? state.index : state.index - 1,
       };
     case "question/option/stored": {
-      // Store the shuffled questions so they don't get reshuffled!
+      // Store the shuffled to avoid reshuffling
       const { index, options, type } = action.payload;
       const storeName = type;
       const optionList = [...state[storeName].storedOptions];
