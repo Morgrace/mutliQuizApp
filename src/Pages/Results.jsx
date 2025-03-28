@@ -8,7 +8,7 @@ function Results() {
   const score = quiz?.score;
   const quizLength = quiz?.length;
   return (
-    <div className=" flex  h-[100vh] flex-col items-center gap-8 !p-[10rem_2rem_0]">
+    <div className=" flex  h-[100dvh] flex-col items-center gap-8 !p-[10rem_2rem_0]">
       <div
         className="bg-(--color-blue) flex aspect-square items-center
         justify-center rounded-[50%] !p-16 outline-8 outline-offset-4 outline-[#407DD8]"

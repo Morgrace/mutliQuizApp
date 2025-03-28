@@ -24,7 +24,7 @@ function QuizScreen() {
   return isLoading ? (
     <Loader />
   ) : (
-    <div className="flex h-[100vh] flex-col justify-center !p-4">
+    <div className="flex h-[100dvh] flex-col justify-center !p-4">
       <div className="!mb-12 grid justify-center text-center">
         <h3 className="text-[1.4rem] capitalize">{type} Questions</h3>
         <span>{questionLength} questions</span>
