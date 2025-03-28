@@ -5,7 +5,7 @@ import RecentActivity from "../components/RecentActivity";
 
 function HomePage() {
   return (
-    <div className="flex h-[97vh] flex-col gap-10 !p-[1rem_1.5rem_0]">
+    <div className="flex h-[100dvh] flex-col gap-10 !p-[1rem_1.5rem_0]">
       <Header />
       <main>
         <Categories />
