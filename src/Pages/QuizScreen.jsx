@@ -1,25 +1,23 @@
-import { useState } from 'react';
-import Loader from '../components/Loader';
-import QuizOptions from '../components/QuizOptions';
-import { useQuiz } from '../contexts/QuizContext';
-import useFetchQuestion from '../Hooks/useFetchQuestion';
-import decodeHTML from '../functions/decodeHTML';
-import Footer from '../components/Footer';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import Loader from "../components/Loader";
+import QuizOptions from "../components/QuizOptions";
+import { useQuiz } from "../contexts/QuizContext";
+import useFetchQuestion from "../Hooks/useFetchQuestion";
+import decodeHTML from "../functions/decodeHTML";
+import Footer from "../components/Footer";
+import { Link, useNavigate } from "react-router-dom";
 
 function QuizScreen() {
   const { state, dispatch } = useQuiz();
-  const { type, index, isLoading, finish } = state;
+  const { type, index, isLoading } = state;
   const [toggleSeeResult, setToggleSeeResult] = useState(false);
   const navigate = useNavigate();
 
-  // Instead of using 'questionType', get the quiz data from state using 'type'
-  const quizData = state[type]; // quizData should have { questions, score, storedOptions, userAnswers }
-  const userAnswer = quizData.userAnswers;
+  const quizData = state[type];
+  const userAnswer = quizData?.userAnswers;
   const hasAnswered = userAnswer[index]?.hasAnswered || false;
 
-  // Access questions from quizData instead of expecting state[type] to be an array
-  const questionLength = quizData.questions.length;
+  const questionLength = quizData?.questions.length;
 
   useFetchQuestion(type);
 
@@ -36,10 +34,12 @@ function QuizScreen() {
         <h4 className="text-(--color-blue)">
           Question {`${index + 1}/${questionLength}`}
         </h4>
-        <span className="justify-self-end text-[#A02525]">Quit</span>
+        <Link to="/" className="justify-self-end text-[#A02525]">
+          Quit
+        </Link>
 
         <h3 className="col-span-2 text-[1.4rem]">
-          {decodeHTML(quizData.questions.at(index)?.question)}
+          {decodeHTML(quizData?.questions.at(index)?.question)}
         </h3>
 
         {/* Pass quizData or current question to QuizOptions */}
@@ -48,7 +48,7 @@ function QuizScreen() {
         <div className="col-span-2 grid gap-4 justify-self-start !p-3">
           <button
             disabled={!hasAnswered}
-            onClick={() => setToggleSeeResult(value => !value)}
+            onClick={() => setToggleSeeResult((value) => !value)}
             className="text-(--color-blue) justify-self-start"
           >
             See Results &#9660;
@@ -62,7 +62,7 @@ function QuizScreen() {
       </div>
       <div className="flex justify-end gap-4">
         <button
-          onClick={() => dispatch({ type: 'question/prev' })}
+          onClick={() => dispatch({ type: "question/prev" })}
           className="bg-(--color-blue) rounded-md !p-3 text-[1.4rem] text-white"
         >
           Previous
@@ -71,7 +71,7 @@ function QuizScreen() {
           onClick={handleNext}
           className="bg-(--color-blue) rounded-md !p-[.7rem_1.7rem] text-[1.4rem] text-white"
         >
-          {index === questionLength - 1 ? 'Finish' : 'Next'}
+          {index === questionLength - 1 ? "Finish" : "Next"}
         </button>
       </div>
       <Footer className="!mt-auto self-stretch" />
@@ -79,9 +79,9 @@ function QuizScreen() {
   );
 
   function handleNext() {
-    dispatch({ type: 'question/next' });
+    dispatch({ type: "question/next" });
     setToggleSeeResult(false);
-    if (finish) navigate('/results', { replace: true });
+    if (index === questionLength - 1) navigate("/results", { replace: true });
   }
 }
 

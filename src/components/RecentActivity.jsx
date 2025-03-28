@@ -1,6 +1,7 @@
 import RecentActivityItem from './RecentActivityItem';
 
 const RecentActivity = function () {
+  
   return (
     <div className="">
       <h3 className="!mb-[1rem] text-[1.2rem]">Recent Activity</h3>

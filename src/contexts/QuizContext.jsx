@@ -1,6 +1,6 @@
-import { createContext, useContext, useReducer } from 'react';
+import { createContext, useContext, useReducer } from "react";
 
-const getQuestions = type => {
+const getQuestions = (type) => {
   try {
     const stored = localStorage.getItem(type);
     return stored ? JSON.parse(stored) : [];
@@ -15,37 +15,37 @@ const QuizContext = createContext();
 const initialState = {
   index: 0,
   type: null,
-  error: '',
-  start: false,
-  finish: false,
+  error: "",
+  start: false, // unused state
+  finish: false, // unused state
   isLoading: false,
 
   general: {
-    questions: getQuestions('general'),
+    questions: getQuestions("general"),
     score: 0,
     storedOptions: [],
     userAnswers: {},
   },
   mathematics: {
-    questions: getQuestions('mathematics'),
+    questions: getQuestions("mathematics"),
     score: 0,
     storedOptions: [],
     userAnswers: {},
   },
   nature: {
-    questions: getQuestions('nature'),
+    questions: getQuestions("nature"),
     score: 0,
     storedOptions: [],
     userAnswers: {},
   },
   sports: {
-    questions: getQuestions('sports'),
+    questions: getQuestions("sports"),
     score: 0,
     storedOptions: [],
     userAnswers: {},
   },
   random: {
-    questions: getQuestions('random'),
+    questions: getQuestions("random"),
     score: 0,
     storedOptions: [],
     userAnswers: {},
@@ -54,9 +54,9 @@ const initialState = {
 
 function reducer(state, action) {
   switch (action.type) {
-    case 'loading':
-      return { ...state, isLoading: true, error: '', type: action.payload };
-    case 'rejected':
+    case "loading":
+      return { ...state, isLoading: true, error: "", type: action.payload };
+    case "rejected":
       return { ...state, isLoading: false, error: action.payload };
     case `${state.type}/questions`:
       return {
@@ -64,12 +64,8 @@ function reducer(state, action) {
         isLoading: false,
         [state.type]: { ...state[state.type], questions: action.payload },
       };
-    // case 'mathematics/questions':
-    //   return {
-    //     ...state,
-    //     mathematics: { ...state.mathematics, questions: action.payload },
-    //   };
-    case 'quiz/select': // when questions get selected
+
+    case "quiz/select": // when questions get selected
       return {
         ...state,
         start: true,
@@ -77,7 +73,7 @@ function reducer(state, action) {
         index: 0,
         type: action.payload,
       };
-    case 'question/answered': {
+    case "question/answered": {
       // when an option is picked
       const questionType = action.payload.type;
       const addScore =
@@ -100,7 +96,7 @@ function reducer(state, action) {
         },
       };
     }
-    case 'question/next': {
+    case "question/next": {
       const questionLimit =
         state.index < state[state.type].questions.length - 1;
       return {
@@ -110,12 +106,12 @@ function reducer(state, action) {
         index: questionLimit ? state.index + 1 : state.index,
       };
     }
-    case 'question/prev':
+    case "question/prev":
       return {
         ...state,
         index: state.index < 1 ? state.index : state.index - 1,
       };
-    case 'question/option/stored': {
+    case "question/option/stored": {
       // Store the shuffled questions so they don't get reshuffled!
       const { index, options, type } = action.payload;
       const storeName = type;
@@ -140,7 +136,7 @@ function QuizProvider({ children }) {
 function useQuiz() {
   const context = useContext(QuizContext);
   if (context === undefined)
-    throw new Error('useQuiz must be used within the QuizProvider');
+    throw new Error("useQuiz must be used within the QuizProvider");
   return context;
 }
 

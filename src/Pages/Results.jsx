@@ -1,11 +1,12 @@
-import { Link } from 'react-router-dom';
-import Footer from '../components/Footer';
-import { useQuiz } from '../contexts/QuizContext';
+import { Link } from "react-router-dom";
+import Footer from "../components/Footer";
+import { useQuiz } from "../contexts/QuizContext";
 
 function Results() {
-  const {
-    state: { generalScore, general },
-  } = useQuiz();
+  const { state } = useQuiz();
+  const quiz = state[state.type];
+  const score = quiz?.score;
+  const quizLength = quiz?.length;
   return (
     <div className=" flex  h-[100vh] flex-col items-center gap-8 !p-[10rem_2rem_0]">
       <div
@@ -13,16 +14,16 @@ function Results() {
         justify-center rounded-[50%] !p-16 outline-8 outline-offset-4 outline-[#407DD8]"
       >
         <h3 className=" text-center text-[2.4rem] text-white">
-          Your Score{' '}
+          Your Score{" "}
           <span className="block text-[3.2rem]">
-            {generalScore}/{general.length}
+            {score > 0 ? `${score}/${quizLength}` : 0}
           </span>
         </h3>
       </div>
 
       <h3 className="text-(--color-blue) !m-[2rem_0_4rem] text-center text-[2.4rem] font-medium">
-        Congratulations
-        <span className="block text-2xl ">{getMessage(generalScore)}</span>
+        {score > 0 ? "Congratulations" : "Awwwwwn 😦"}
+        <span className="block text-2xl ">{getMessage(score)}</span>
       </h3>
 
       <div className=" !mt-auto grid gap-10 self-stretch text-2xl  text-white">
@@ -39,7 +40,7 @@ function Results() {
     </div>
   );
 
-  function getMessage(score, userName = '') {
+  function getMessage(score, userName = "") {
     if (score >= 80) {
       return `Amazing work! ${userName} You're a quiz master!`;
     } else if (score >= 50) {
@@ -53,17 +54,17 @@ function Results() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'My Quiz App Results',
-          text: `I scored ${generalScore}/${general.length} on the quiz!`,
+          title: "My Quiz App Results",
+          text: `I scored ${score}/${quizLength} on the quiz!`,
           url: window.location.href, // Or a specific URL you want to share
         });
-        alert('Thanks for sharing!');
+        alert("Thanks for sharing!");
       } catch (error) {
-        alert('Error sharing', error);
+        alert("Error sharing", error);
       }
     } else {
       // Fallback if Web Share API is not available
-      alert('Sharing is not supported in your browser. Please copy the link.');
+      alert("Sharing is not supported in your browser. Please copy the link.");
     }
   }
 }
